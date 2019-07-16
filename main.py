@@ -16,5 +16,14 @@ def shrink(long_url):
         else:
             c.execute(f'INSERT INTO URLs(long_urls, short_urls) VALUES ("{long_url}","{short_url}")')
             conn.commit()
+        return short_url
 
-shrink('www.google.com')
+
+def expan(short_url):
+    c.execute(f'SELECT long_urls FROM urls WHERE short_urls = "{short_url}"')
+    result = c.fetchone()
+    return result
+
+
+print(shrink('www.google.com'))
+print(expan('tiny/4yJNg'))
