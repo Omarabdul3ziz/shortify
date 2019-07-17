@@ -1,29 +1,24 @@
-import string
-import sqlite3
-from random import choices
+import module, sqlite3
+from flask import Flask, render_template, request
+app = Flask(__name__)
 
-conn = sqlite3.connect('module.db')
+
+conn = conn = sqlite3.connect('module.db', check_same_thread=False)
 c = conn.cursor()
 
-def shrink(long_url):
-        characters = string.ascii_letters + string.digits
-        short_url = 'tiny/' + ''.join(choices(characters, k=5))
-        c.execute(f'SELECT short_urls FROM urls WHERE short_urls = "{short_url}"')
-        result = c.fetchone()
-        if result :
-            shrink(long_url)
 
-        else:
-            c.execute(f'INSERT INTO URLs(long_urls, short_urls) VALUES ("{long_url}","{short_url}")')
-            conn.commit()
-        return short_url
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/input', methods=['GET', 'POST'])
+def get_link():
+    return render_template('input.html')
 
 
-def expan(short_url):
-    c.execute(f'SELECT long_urls FROM urls WHERE short_urls = "{short_url}"')
-    result = c.fetchone()
-    return result
-
-
-print(shrink('www.google.com'))
-print(expan('tiny/4yJNg'))
+@app.route('/output', methods=['GET', 'POST'])
+def give_link():
+    #print(str(request.form))
+    #return ""
+    long_url = request.args.get('long_url')
+    print(long_url)
+    mini = module.shortify(long_url)
+    maxi = module.longify(mini)
+    return render_template('output.html',long_url= 'https://'+''.join(maxi) ,short_url = mini )
